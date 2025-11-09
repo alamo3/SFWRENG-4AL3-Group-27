@@ -1,0 +1,59 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# macOS Finder files
+.DS_Store
+
+# Virtual environments
+env/
+venv/
+ENV/
+.venv/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# PyCharm / IntelliJ
+.idea/
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+cover/
+coverage.xml
+*.cover
+*.py,cover
+*.pytest_cache/
+
+# C extensions
+*.so
+
+# MyPy cache
+.mypy_cache/
+
+# Sphinx docs
+docs/_build/
+
+# Local config or secrets
+*.env
+*.local
+
+# Backup and swap files
+*~
+*.swp
