@@ -63,7 +63,11 @@ You should write about your dataset here, following the guidelines regarding ite
 
 \section{Features}
 
-Describe any features you used for your model, or how your data was input to your model. Are you doing feature engineering or feature selection? Are you learning embeddings? Is it all part of one neural network? Refer to item 2. This may range from 0.25 pages to 0.5 pages.
+For the initial implementation, no feature engineering or feature selection is being done. The model simply takes in an RGB image as input and processes it through a ResNet Convolutional Neural Network backbone. This transforms the pixels data into learned feature embeddings space. As such, since the backbone is an off-the-shelf CNN that learns feature representation directly from the incoming data, there is no manual feature selection needed. The exact implementation details of the backbone into the overall Neural Network model will be described in the section below. 
+
+The use of a ResNet CNN backbone is similar to what other related works like DCDepth, MSFusion and NDDepth did as described in section 2, where features and correlations are dynamically extracted. The reason this works well, as opposed to manually selecting features is because the correlations between various features change a lot based on the image that is presented. As such, we need a model that captures geometric and semantic cues that are hard to generalize as hard-coded features. Evidently a CNN is needed to extract the features themselves. 
+
+The ResNet CNN backbone and depth nerual network are both a part of the same nerual network, but seperated as stages in the overall structure. The CNN backbone serves as the "encoder" stage of the overall neural network, where it is a CNN that outputs the learned feature embeddings space. These features are then passed into the "decoder" layer which upsamples the embeddings to return a depth map that is the same size as the original RGB image.
 
 \section{Implementation}
 
