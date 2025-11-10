@@ -71,7 +71,35 @@ The ResNet CNN backbone and depth nerual network are both a part of the same ner
 
 \section{Implementation}
 
-Describe your model and implementation here. Refer to item 4. This may take around a page.
+As mentioned in the Features section above, the model consists of "encoder" and "decoder" layers, which is a simplification of the papers that we read in the related work section above. The goal of the model is to take in a single RGB image as input and predict a depth value for each pixel. Since this is mono depth perception, the accuracy of each depth value will be measured according to the relative depth in comparison to other pixels in the image. 
+
+\subsection{Encoder}
+
+For the initial implmentation, we are using a ResNet-34 model as our encoder. This model consists of 4 successive convolutional layers that increase the channel dimensionality based on features extracted at each layer. Earlier layers focus on learning low-level patterns like edges and color gradients, while later layers focus on higher-level geometric cues. Each layer doubles the channel dimensionality, while halfing the resolution. With 64, 128, 256 and 512 channels outputted from layers 1 to 4 respectively. As mentioned in the Features section above, we do not manually design features, instead they are learned automatically based on the image that is passed in. 
+
+\subsection{Decoder}
+
+The decoder in the implementation maps the learned embeddings back to pixel-aligned depth prediction, such that it is the same resolution as the original RGB input image. For the initial implementation, we use a sequence of transposed convolutional layers to upsample feature maps back to higher spatial resolution. Upsampling 4 times across all 4 layers from the backbone produces a single-channel depth map. A ReLU activation is then applied to ensure there is only non-negative depth values. 
+
+\subsection{Data Input and Processing}
+
+We trained and validated the model on KITTI Depth Selection Dataset, which is a subset of the entire depth prediction dataset KITTI provides. The reason we are working with a subset for the initial implementation is because we wanted to test training and evaluating the model on a subset before we download the entire dataset and require GPU clusters to train the model on all the datasets. 
+
+Each input RGB image is resized and normalized using mean and standard deviation, as required by the ResNet-34 backbone. The ground truth (target output) depth maps are stored as 16 bit PNGs, which are converted to meters by dividing by 256. Each image and depth map is then returned as PyTorch tensors where the model is being trained as (image, depth) which represents the (input, label) pair. 
+
+\subsection{Training Setup and Loss Function}
+
+The model is trained using supervised learning, where the model's predicted depth map is compared to the ground-truth depth using scale-invariant loss. The reason scale-invariant loss function was used in this case, was to make it easier to benchmark this model against the other ones mentioned in the Related Work section above. 
+
+Moreover, it is important to note that the predicted depth map is scaled using the target depth map to prevent large errors caused by the actual depth prediction values being off. Since this project focuses on mono depth perception, and not stereo, our goal is not to get the true depth in meters, but rather to determine whether the relative depth of different pixels is the same as the target.
+
+The model is trained using stochastic gradient descent, training on a batch of 4 images at a time until all 1000 images have been passed through the model. This process is repeated for the set number of epoches defined in the code. 
+
+During backpropagation, the encoder and decoder weights are updated, allowing the network to update it's learned feature embeddings. Since the system is trained together with encoder and decoder actively involved, the backbone's learned features also start to become more specialized for depth prediction rather than classification (which is what it was originally meant for). 
+
+The trained model is then stored as a .pth file, with the model's trained weights. 
+
+You can access the full implementation at our \href{https://github.com/alamo3/SFWRENG-4AL3-Group-27/tree/main}{GitHub Repository}.
 
 \section{Results and Evaluation}
 
