@@ -57,3 +57,13 @@ docs/_build/
 # Backup and swap files
 *~
 *.swp
+
+
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.out
+*.pdf
+*.synctex.gz
