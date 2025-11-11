@@ -193,7 +193,26 @@ You can access the full implementation at our \href{https://github.com/alamo3/SF
 
 \section{Results and Evaluation} \label{sec:results_and_evaluation}
 
-How are you evaluating your model? What results do you have so far? What are your baselines? Refer to item 5. This may take around 0.5 pages.
+%How are you evaluating your model? What results do 
+%you have so far? What are your baselines? Refer to item 5. 
+%This may take around 0.5 pages.
+
+The loss function used to train the model is the Scale Invariant Loss, which was first defined 
+by Eigen et al. in their 2014 paper "Depth Map Prediction from a Single Image using a Multi-Scale Deep Network".
+
+It is defined as follows:
+\[
+  D(y, y^*) = \frac{1}{n} \sum_{i=0}^{n} d_{i}^2 - \frac{1}{n^2} (\sum_{i=0}^{n} d_i)^2
+\]
+
+Where $d_i = \log y_i - \log y_i^*$, $y_i$ is the predicted depth, $y_i^*$ is the ground truth depth, and $n$ is the number of pixels in the depth map.
+
+This function is particularly useful for evaluating the quality of the depth estimation 
+since it focuses on the relative differences between predicted and ground truth depths,
+rather than absolute differences. This is important since depth predictions can vary
+by a scale factor as long as the relative distances between objects are preserved.
+Ex: If the predicted depth is consistently twice the ground truth depth, the scale invariant loss will be low, indicating that the model has learned
+the relative depth relationships correctly.
 
 \section{Feedback and Plans} \label{sec:feedback_and_plans}
 
