@@ -39,9 +39,9 @@
 
 Here, write a brief introduction to the problem you are solving. This can be adapted from your problem description and motivation from the original proposal. This should be around 0.25-0.5 pages.
 
-\section{Related Work}
+\section{Related Work} \label{sec:related-work}
 
-There are numerous groups of people and institutions that experimented with unique methods for mono depth prediction, particularly using the same KITTI dataset described in the section below. In fact, on the website that was used to retrieve this dataset, there is a leaderboard outlining which methods yield the best results \citep{KITTI}. These methods were explored by our team to understand the approaches that obtain the best result. Although the related works were used as inspiration, the purpose of this project is to experiment and find unique ways to improve on existing methods. 
+There are numerous groups of people and institutions that experimented with unique methods for mono depth prediction, particularly using the same KITTI dataset described in the section \href{sec:dataset}{below}. In fact, on the website that was used to retrieve this dataset, there is a leaderboard outlining which methods yield the best results \citep{KITTI}. These methods were explored by our team to understand the approaches that obtain the best result. Although the related works were used as inspiration, the purpose of this project is to experiment and find unique ways to improve on existing methods. 
 
 Based on our findings of related works, we realized one of the key element that varies between different papers is the choice of backbone used to extract feature maps from RGB images. The backbone defines the feature space, from which depth can be infered using a Neural Network, and therefore has a direct impact on accuracy.
 
@@ -57,25 +57,25 @@ Some of the relevant works that were investigated include:
   \item NDDepth: Uses a standard ResNet-based backbone to extract 2D image features from RGB image. The decoder branches into two prediction heads, the normal distance head and the direct depth head. The depth representation is the true depth in meters, which is derived by selecting which head to trust per pixel \citep{Shao2023NDDepth}.
 \end{itemize}
 
-\section{Dataset}
+\section{Dataset} \label{sec:dataset}
 
 You should write about your dataset here, following the guidelines regarding item 1. This section may be 0.5-1 pages. Depending on your specific dataset, you may want to include subsections for the preprocessing, annotation, etc.
 
-\section{Features}
+\section{Features} \label{sec:features}
 
-For the initial implementation, no feature engineering or feature selection is being done. The model simply takes in an RGB image as input and processes it through a ResNet Convolutional Neural Network backbone. This transforms the pixels data into learned feature embeddings space. As such, since the backbone is an off-the-shelf CNN that learns feature representation directly from the incoming data, there is no manual feature selection needed. The exact implementation details of the backbone into the overall Neural Network model will be described in the section below. 
+For the initial implementation, no feature engineering or feature selection is being done. The model simply takes in an RGB image as input and processes it through a ResNet Convolutional Neural Network backbone. This transforms the pixels data into learned feature embeddings space. As such, since the backbone is an off-the-shelf CNN that learns feature representation directly from the incoming data, there is no manual feature selection needed. The exact implementation details of the backbone into the overall Neural Network model will be described in the section \href{sec:implementation}{below}. 
 
-The use of a ResNet CNN backbone is similar to what other related works like DCDepth, MSFusion and NDDepth did as described in section 2, where features and correlations are dynamically extracted. The reason this works well, as opposed to manually selecting features is because the correlations between various features change a lot based on the image that is presented. As such, we need a model that captures geometric and semantic cues that are hard to generalize as hard-coded features. Evidently a CNN is needed to extract the features themselves. 
+The use of a ResNet CNN backbone is similar to what other related works like DCDepth, MSFusion and NDDepth did as described in \href{sec:features}{section 2}, where features and correlations are dynamically extracted. The reason this works well, as opposed to manually selecting features is because the correlations between various features change a lot based on the image that is presented. As such, we need a model that captures geometric and semantic cues that are hard to generalize as hard-coded features. Evidently a CNN is needed to extract the features themselves. 
 
 The ResNet CNN backbone and depth nerual network are both a part of the same nerual network, but seperated as stages in the overall structure. The CNN backbone serves as the "encoder" stage of the overall neural network, where it is a CNN that outputs the learned feature embeddings space. These features are then passed into the "decoder" layer which upsamples the embeddings to return a depth map that is the same size as the original RGB image.
 
-\section{Implementation}
+\section{Implementation} \label{sec:implementation}
 
-As mentioned in the Features section above, the model consists of "encoder" and "decoder" layers, which is a simplification of the papers that we read in the related work section above. The goal of the model is to take in a single RGB image as input and predict a depth value for each pixel. Since this is mono depth perception, the accuracy of each depth value will be measured according to the relative depth in comparison to other pixels in the image. 
+As mentioned in the \href{sec:features}{Features} section above, the model consists of "encoder" and "decoder" layers, which is a simplification of the papers that we read in the \href{sec:related-work}{Related Work} section above. The goal of the model is to take in a single RGB image as input and predict a depth value for each pixel. Since this is mono depth perception, the accuracy of each depth value will be measured according to the relative depth in comparison to other pixels in the image. 
 
 \subsection{Encoder}
 
-For the initial implmentation, we are using a ResNet-34 model as our encoder. This model consists of 4 successive convolutional layers that increase the channel dimensionality based on features extracted at each layer. Earlier layers focus on learning low-level patterns like edges and color gradients, while later layers focus on higher-level geometric cues. Each layer doubles the channel dimensionality, while halfing the resolution. With 64, 128, 256 and 512 channels outputted from layers 1 to 4 respectively. As mentioned in the Features section above, we do not manually design features, instead they are learned automatically based on the image that is passed in. 
+For the initial implmentation, we are using a ResNet-34 model as our encoder. This model consists of 4 successive convolutional layers that increase the channel dimensionality based on features extracted at each layer. Earlier layers focus on learning low-level patterns like edges and color gradients, while later layers focus on higher-level geometric cues. Each layer doubles the channel dimensionality, while halfing the resolution. With 64, 128, 256 and 512 channels outputted from layers 1 to 4 respectively. As mentioned in the \href{sec:features}{Features} section above, we do not manually design features, instead they are learned automatically based on the image that is passed in. 
 
 \subsection{Decoder}
 
@@ -89,7 +89,7 @@ Each input RGB image is resized and normalized using mean and standard deviation
 
 \subsection{Training Setup and Loss Function}
 
-The model is trained using supervised learning, where the model's predicted depth map is compared to the ground-truth depth using scale-invariant loss. The reason scale-invariant loss function was used in this case, was to make it easier to benchmark this model against the other ones mentioned in the Related Work section above. 
+The model is trained using supervised learning, where the model's predicted depth map is compared to the ground-truth depth using scale-invariant loss. The reason scale-invariant loss function was used in this case, was to make it easier to benchmark this model against the other ones mentioned in the \href{sec:related-work}{Related Work} section above. 
 
 Moreover, it is important to note that the predicted depth map is scaled using the target depth map to prevent large errors caused by the actual depth prediction values being off. Since this project focuses on mono depth perception, and not stereo, our goal is not to get the true depth in meters, but rather to determine whether the relative depth of different pixels is the same as the target.
 
@@ -101,17 +101,17 @@ The trained model is then stored as a .pth file, with the model's trained weight
 
 You can access the full implementation at our \href{https://github.com/alamo3/SFWRENG-4AL3-Group-27/tree/main}{GitHub Repository}.
 
-\section{Results and Evaluation}
+\section{Results and Evaluation} \label{sec:results_and_evaluation}
 
 How are you evaluating your model? What results do you have so far? What are your baselines? Refer to item 5. This may take around 0.5 pages.
 
-\section{Feedback and Plans}
+\section{Feedback and Plans} \label{sec:feedback_and_plans}
 
 Write about your plans for the remainder of the project. This should include a discussion of the feedback you received from your TA, and how you plan to improve your approach. Reflect on your implementation and areas for improvement. Refer to item 6. This may be around 0.5 pages.
 
 \nocite{KITTI, Piccinelli2024UniDepth, Bie2025MultiSpaceDepth, Wang2024DCDepth, Shao2023NDDepth}
 
-\section*{Team Contributions}
+\section*{Team Contributions} \label{sec:team_contributions}
 
 Write in this section a few sentences describing the contributions of each team member. What did each member work on? Refer to item 7.
 
