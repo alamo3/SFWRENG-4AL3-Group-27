@@ -18,6 +18,7 @@
 \usepackage{inconsolata}
 \usepackage{graphicx}
 \usepackage{float}
+\usepackage{amsmath}
 
 \setlength{\parindent}{0pt}
 
@@ -31,7 +32,7 @@
 
 
 \author{Omar Alam, Nirmal Chaudhary, Kevin Zhu \\
-  \texttt{\{alamo2,macid2,macid3\}@mcmaster.ca} }
+  \texttt{\{alamo2,chaudn12,zhuk41\}@mcmaster.ca} }
 
 %\author{
 %  \textbf{First Author\textsuperscript{1}},
@@ -203,6 +204,35 @@ rather than absolute differences. This is important since depth predictions can 
 by a scale factor as long as the relative distances between objects are preserved.
 Ex: If the predicted depth is consistently twice the ground truth depth, the scale invariant loss will be low, indicating that the model has learned
 the relative depth relationships correctly.
+
+In addition to using SiLog, the following metrics are also used:
+\begin{enumerate}
+  \item Absolute Relative Difference (Abs Rel):
+  \[
+    \text{Abs Rel} = \frac{1}{n} \sum_{i=0}^{n} \frac{|y_i - y_i^*|}{y_i^*}
+  \]
+
+  \item Relative Squared Difference (Rel Sq):
+  \[
+    \text{Rel Sq} = \frac{1}{n} \sum_{i=0}^{n} \frac{(y_i - y_i^*)^2}{(y_i^*)^2}
+  \]
+
+  \item Inverse Root Mean Squared Error (iRMSE):
+  \[
+    \text{iRMSE} = \sqrt{\frac{1}{n} \sum_{i=0}^{n} \left(\frac{1}{y_i} - \frac{1}{y_i^*}\right)^2}
+  \]
+\end{enumerate}
+These metrics provide a comprehensive evaluation of the model's performance.
+The iRMSE metric is particularly useful for determining depth accuracy for closer objects.
+It penalizes large errors in depth estimation for nearby objects more heavily than for distant objects,
+since it is based on the inverse of depth values.
+
+The dataset is already split into training and validation sets by the authors of the KITTI dataset as 
+mentioned in the \href{sec:dataset}{Dataset} section above with a roughly 80/20 split.
+There is no cross-validation performed due to the sufficiently large size of the dataset.
+However, this experiment was conducted with a 
+very small subset of the entire dataset, using only 1000 images for training due to 
+computational constraints. 
 
 \section{Feedback and Plans} \label{sec:feedback_and_plans}
 
