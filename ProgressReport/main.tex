@@ -82,7 +82,7 @@
 
 \section{Introduction}
 
-As researchers are looking for more ways for computers to read the environment, depth perception is becoming an increasingly important feature. Traditionally, depth perception is done with LIDAR and radar. Lidar and radar-based sensors are accurate at long ranges but are more expensive compared to camera-based setups. Cameras, on the other hand do not have proper depth perception without the use of multiple lenses creating a stereo setup. Even then, stereo setups are less accurate than LIDER or radar. 
+As researchers are looking for more ways for computers to read the environment, depth perception is becoming an increasingly important feature. Traditionally, depth perception is done with LIDAR and radar. Lidar and radar-based sensors are accurate at long ranges but are more expensive compared to camera-based setups. Cameras, on the other hand do not have proper depth perception without the use of multiple lenses creating a stereo setup. Even then, stereo setups are less accurate than LiDAR or radar. 
 
 To attempt the accuracy of LIDAR setups without needing use LIDAR, we are using deep learning techniques to create a model that can predict distances on an image. The model will be trained on taken images along with corresponding distances measured from more accurate LIDAR sources. This problem is still considered an unsolved research problem since it is extremely difficult for models to learn to estimate depth accurately enough for robotics applications using a single image only. 
 
@@ -93,16 +93,16 @@ If the single image depth perception is solved effectively with a robust solutio
 
 There are numerous groups of people and institutions that experimented with unique methods for mono depth prediction, particularly using the same KITTI dataset described in the section \href{sec:dataset}{below}. In fact, on the website that was used to retrieve this dataset, there is a leaderboard outlining which methods yield the best results \citep{KITTI}. These methods were explored by our team to understand the approaches that obtain the best result. Although the related works were used as inspiration, the purpose of this project is to experiment and find unique ways to improve on existing methods. 
 
-Based on our findings of related works, we realized one of the key element that varies between different papers is the choice of backbone used to extract feature maps from RGB images. The backbone defines the feature space, from which depth can be infered using a Neural Network, and therefore has a direct impact on accuracy.
+Based on our findings of related works, we realized one of the key element that varies between different papers is the choice of backbone used to extract feature maps from RGB images. The backbone defines the feature space, from which depth can be inferred using a Neural Network, and therefore has a direct impact on accuracy.
 
 Moreover, in addition to the backbone, the decoder and depth representation that is used are other key element that vary between related works. The decoder is a neural network that takes in the feature map produced by the backbone and reconstructs a dense, spatially aligned feature map (at the same resolution as the input RGB image). Following this, the depth representation head converts the decoded feature map into a final depth prediction. As such, these two components describe how to reconstruct and analyze depth using the feature map outputted by the backbone. 
 
-While looking into related work, we realized some approaches were training a model to analyze stereo depth perception instead of mono. These appraoches were ignored for the purpose of this project since the focus is on mono depth perception. But the comparison of backbones used between stereo versus mono approaches was interesting. Since, the initial assumption was that for mono depth perception a more expressive backbone would be needed since it can't use parralax method. However, this wasn't really mentioned in any of the papers. 
+While looking into related work, we realized some approaches were training a model to analyze stereo depth perception instead of mono. These approaches were ignored for the purpose of this project since the focus is on mono depth perception. But the comparison of backbones used between stereo versus mono approaches was interesting. Since, the initial assumption was that for mono depth perception a more expressive backbone would be needed since it can't use parallax method. However, this wasn't really mentioned in any of the papers. 
 
 Some of the relevant works that were investigated include:
 \begin{itemize}
   \item UniDepth: Uses a ViT-based DPT (Dense Prediction Transformer) backbone. For the decoder, it uses a DPT-style multi-scale fusion decoder. For the depth representation, it predicts a pseudo-spherical 3D representation. \citep{Piccinelli2024UniDepth}. 
-  \item MSFusion: Uses a standard ResNet50-based encoder backbone to extract 2D texture features. It also converts the image into a 3D point cloud representation. It then uses a multi-space fusion decoder to fuse both into a sptial feature map. For depth representation, it outputs the actual depth prediction \citep{Bie2025MultiSpaceDepth}.
+  \item MSFusion: Uses a standard ResNet50-based encoder backbone to extract 2D texture features. It also converts the image into a 3D point cloud representation. It then uses a multi-space fusion decoder to fuse both into a spatial feature map. For depth representation, it outputs the actual depth prediction \citep{Bie2025MultiSpaceDepth}.
   \item DCDepth: Uses a standard ResNet or HRNet backbone to extract 2D image features from RGB image. The decoder outputs DCT frequency coefficients for each depth patch. Uses inverse DCT to transform the coefficients into a pixel-wise depth as the depth representation \citep{Wang2024DCDepth}.
   \item NDDepth: Uses a standard ResNet-based backbone to extract 2D image features from RGB image. The decoder branches into two prediction heads, the normal distance head and the direct depth head. The depth representation is the true depth in meters, which is derived by selecting which head to trust per pixel \citep{Shao2023NDDepth}.
 \end{itemize}
@@ -176,7 +176,7 @@ As mentioned in the \href{sec:features}{Features} section above, the model consi
 
 \subsection{Encoder}
 
-For the initial implmentation, we are using a ResNet-34 model as our encoder. This model consists of 4 successive convolutional layers that increase the channel dimensionality based on features extracted at each layer. Earlier layers focus on learning low-level patterns like edges and color gradients, while later layers focus on higher-level geometric cues. Each layer doubles the channel dimensionality, while halfing the resolution. With 64, 128, 256 and 512 channels outputted from layers 1 to 4 respectively. As mentioned in the \href{sec:features}{Features} section above, we do not manually design features, instead they are learned automatically based on the image that is passed in. 
+For the initial implementation, we are using a ResNet-34 model as our encoder. This model consists of 4 successive convolutional layers that increase the channel dimensionality based on features extracted at each layer. Earlier layers focus on learning low-level patterns like edges and color gradients, while later layers focus on higher-level geometric cues. Each layer doubles the channel dimensionality, while halving the resolution. With 64, 128, 256 and 512 channels outputted from layers 1 to 4 respectively. As mentioned in the \href{sec:features}{Features} section above, we do not manually design features, instead they are learned automatically based on the image that is passed in. 
 
 \subsection{Decoder}
 
@@ -194,7 +194,7 @@ The model is trained using supervised learning, where the model's predicted dept
 
 Moreover, it is important to note that the predicted depth map is scaled using the target depth map to prevent large errors caused by the actual depth prediction values being off. Since this project focuses on mono depth perception, and not stereo, our goal is not to get the true depth in meters, but rather to determine whether the relative depth of different pixels is the same as the target.
 
-The model is trained using stochastic gradient descent, training on a batch of 4 images at a time until all 1000 images have been passed through the model. This process is repeated for the set number of epoches defined in the code. 
+The model is trained using stochastic gradient descent, training on a batch of 4 images at a time until all 1000 images have been passed through the model. This process is repeated for the set number of epochs defined in the code. 
 
 During backpropagation, the encoder and decoder weights are updated, allowing the network to update it's learned feature embeddings. Since the system is trained together with encoder and decoder actively involved, the backbone's learned features also start to become more specialized for depth prediction rather than classification (which is what it was originally meant for). 
 
