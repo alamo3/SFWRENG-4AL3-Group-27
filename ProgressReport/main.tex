@@ -37,7 +37,12 @@
 
 \section{Introduction}
 
-Here, write a brief introduction to the problem you are solving. This can be adapted from your problem description and motivation from the original proposal. This should be around 0.25-0.5 pages.
+As researchers are looking for more ways for computers to read the environment, depth perception is becoming an increasingly important feature. Traditionally, depth perception is done with LIDAR and radar. Lidar and radar-based sensors are accurate at long ranges but are more expensive compared to camera-based setups. Cameras, on the other hand do not have proper depth perception without the use of multiple lenses creating a stereo setup. Even then, stereo setups are less accurate than LIDER or radar. 
+
+To attempt the accuracy of LIDAR setups without needing use LIDAR, we are using deep learning techniques to create a model that can predict distances on an image. The model will be trained on taken images along with corresponding distances measured from more accurate LIDAR sources. This problem is still considered an unsolved research problem since it is extremely difficult for models to learn to estimate depth accurately enough for robotics applications using a single image only. 
+
+If the single image depth perception is solved effectively with a robust solution, it will be impactful in many fields, with the primary use being for autonomous features in vehicles. As these vehicles need a large suite of sensors to properly detect their environment, its possible cut costs by reduce the number of sensors needed for proper autonomous function. Cheaper and more accessible depth perception would also encourage other companies to consider and integrate it into products.
+
 
 \section{Related Work} \label{sec:related-work}
 
@@ -107,7 +112,22 @@ How are you evaluating your model? What results do you have so far? What are you
 
 \section{Feedback and Plans} \label{sec:feedback_and_plans}
 
-Write about your plans for the remainder of the project. This should include a discussion of the feedback you received from your TA, and how you plan to improve your approach. Reflect on your implementation and areas for improvement. Refer to item 6. This may be around 0.5 pages.
+%Write about your plans for the remainder of the project. This should include a discussion of the feedback you received from your TA, and how you plan to improve your approach. Reflect on your implementation and areas for improvement. Refer to item 6. This may be around 0.5 pages.
+
+Our first feedback was received during a tutorial when our group proposed to the TA. The TA gave us two pieces of feedback. To look into and base our work off what other work have been done on the subject, and use a Convolutional Neural Network. 
+
+In a call with a TA. They recommended that we should add distribution of distances in the dataset, and a baseline for naive random guess, and maybe a multi layer perceptron (simple model)
+
+Our group knew that there was a lot of previous work done on this subject. We used this to influence how we wanted to approach this problem which was shown in our \href{sec:related-work}{Related Work} section. 
+
+The TAs also mentioned two different methods of implementing our model with both CNNs and MLPs. Our group decide that we wanted to use a CNN specifically ResNet-34 as it was designed to be used for computer vision. However, our group will also use a MLP to use as a baseline and compare to other models 
+
+The last bit of feedback is related to creating a baseline for naive random guess. This is something our group will do as to have a proper comparison for how good our model is. 
+
+Some future plans of our project are to use a larger subset of the KITTI Dataset, as we are currently using a subset. To do this we would use the McMaster servers for computation as the entire dataset is bigger than 100gb and using our own devices would be unreasonable. We will also test different baselines (such as naive guesses and MLPs) and explore other models and different backbones and model configurations (including transformers).
+
+
+
 
 \nocite{KITTI, Piccinelli2024UniDepth, Bie2025MultiSpaceDepth, Wang2024DCDepth, Shao2023NDDepth}
 
