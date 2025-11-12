@@ -149,6 +149,18 @@ To retrieve the required dataset, the raw RGB images must be downloaded
 separately from the depth maps. Some preprocessing was required to remove
 RGB images that did not have corresponding depth maps. 
 
+A preliminary analysis of 1000 images from the training set shows
+the following depth distribution in the dataset:
+\begin{figure}[H]
+  \includegraphics[width=\columnwidth]{distance_distrib.png}
+  \caption{Depth distribution of 1000 images from the KITTI dataset.}
+  \label{fig:depth_distribution}
+\end{figure}
+
+As shown in Figure~\ref{fig:depth_distribution}, the depth values present
+in the dataset are moderately skewed towards closer objects with frequency 
+decreasing as depth increases.
+
 
 \section{Features} \label{sec:features}
 
@@ -156,7 +168,7 @@ For the initial implementation, no feature engineering or feature selection is b
 
 The use of a ResNet CNN backbone is similar to what other related works like DCDepth, MSFusion and NDDepth did as described in \href{sec:features}{section 2}, where features and correlations are dynamically extracted. The reason this works well, as opposed to manually selecting features is because the correlations between various features change a lot based on the image that is presented. As such, we need a model that captures geometric and semantic cues that are hard to generalize as hard-coded features. Evidently a CNN is needed to extract the features themselves. 
 
-The ResNet CNN backbone and depth nerual network are both a part of the same nerual network, but seperated as stages in the overall structure. The CNN backbone serves as the "encoder" stage of the overall neural network, where it is a CNN that outputs the learned feature embeddings space. These features are then passed into the "decoder" layer which upsamples the embeddings to return a depth map that is the same size as the original RGB image.
+The ResNet CNN backbone and depth neural network are both a part of the same neural network, but separated as stages in the overall structure. The CNN backbone serves as the "encoder" stage of the overall neural network, where it is a CNN that outputs the learned feature embeddings space. These features are then passed into the "decoder" layer which upsamples the embeddings to return a depth map that is the same size as the original RGB image.
 
 \section{Implementation} \label{sec:implementation}
 
