@@ -5,7 +5,6 @@
 \usepackage[]{acl}
 \usepackage{times}
 \usepackage{latexsym}
-
 % For proper rendering and hyphenation of words containing Latin characters (including in bib files)
 \usepackage[T1]{fontenc}
 % For Vietnamese characters
@@ -28,10 +27,9 @@
 %
 % and set <dim> to something 5cm or larger.
 
-\title{Group 27 Progress Report:\\Mono Depth Perception}
+\title{Group 27 Progress Report:\\Monocular Depth Perception}
 
 
-\author{Omar Alam, Nirmal Chaudhary, Kevin Zhu \\
 \author{Omar Alam, Nirmal Chaudhary, Kevin Zhu \\
   \texttt{\{alamo2,chaudn12,zhuk41\}@mcmaster.ca} }
 
@@ -127,13 +125,13 @@ If the single image depth perception is solved effectively with a robust solutio
 
 \section{Related Work} \label{sec:related-work}
 
-There are numerous groups of people and institutions that experimented with unique methods for mono depth prediction, particularly using the same KITTI dataset described in the section \href{sec:dataset}{below}. In fact, on the website that was used to retrieve this dataset, there is a leaderboard outlining which methods yield the best results \citep{KITTI}. These methods were explored by our team to understand the approaches that obtain the best result. Although the related works were used as inspiration, the purpose of this project is to experiment and find unique ways to improve on existing methods. 
+There are numerous groups of people and institutions that experimented with unique methods for monocular depth prediction, particularly using the same KITTI dataset described in the section \href{sec:dataset}{below}. In fact, on the website that was used to retrieve this dataset, there is a leaderboard outlining which methods yield the best results \citep{KITTI}. These methods were explored by our team to understand the approaches that obtain the best result. Although the related works were used as inspiration, the purpose of this project is to experiment and find unique ways to improve on existing methods. 
 
 Based on our findings of related works, we realized one of the key element that varies between different papers is the choice of backbone used to extract feature maps from RGB images. The backbone defines the feature space, from which depth can be inferred using a Neural Network, and therefore has a direct impact on accuracy.
 
 Moreover, in addition to the backbone, the decoder and depth representation that is used are other key element that vary between related works. The decoder is a neural network that takes in the feature map produced by the backbone and reconstructs a dense, spatially aligned feature map (at the same resolution as the input RGB image). Following this, the depth representation head converts the decoded feature map into a final depth prediction. As such, these two components describe how to reconstruct and analyze depth using the feature map outputted by the backbone. 
 
-While looking into related work, we realized some approaches were training a model to analyze stereo depth perception instead of mono. These approaches were ignored for the purpose of this project since the focus is on mono depth perception. But the comparison of backbones used between stereo versus mono approaches was interesting. Since, the initial assumption was that for mono depth perception a more expressive backbone would be needed since it can't use parallax method. However, this wasn't really mentioned in any of the papers. 
+While looking into related work, we realized some approaches were training a model to analyze stereo depth perception instead of monocular. These approaches were ignored for the purpose of this project since the focus is on monocular depth perception. But the comparison of backbones used between stereo versus monocular approaches was interesting. Since, the initial assumption was that for monocular depth perception a more expressive backbone would be needed since it can't use parallax method. However, this wasn't really mentioned in any of the papers. 
 
 Some of the relevant works that were investigated include:
 \begin{itemize}
@@ -150,7 +148,7 @@ Some of the relevant works that were investigated include:
 %specific dataset, you may want to include subsections for the preprocessing, 
 %annotation, etc.
 
-The mono depth perception project is using the KITTI Depth Vision Benchmark Suite. 
+The monocular depth perception project is using the KITTI Depth Vision Benchmark Suite. 
 This dataset contains over 93,000 gray scale depth maps along with corresponding
 RGB images and LiDAR scans. The LiDAR scans provide accurate depth information 
 which is used to generate the ground truth depth maps. The resolution of the RGB images
@@ -164,7 +162,7 @@ The following images are a single example from the dataset.
   \caption{An example RGB image from the KITTI dataset.}
   \label{fig:kitti_rgb}
 \end{figure}
-
+\vspace{-20pt}
 \begin{figure}[H]
   \includegraphics[width=\columnwidth]{depth_map_0-modified.png}
   \caption{The corresponding ground truth depth map for the RGB image in Figure~\ref{fig:kitti_rgb}. (Inverted for visualization purposes)}
@@ -177,7 +175,7 @@ the LiDAR tend to be sparse, especially for objects that are far away from the s
 Since the KITTI dataset also contains stereo images, the authors of the dataset
 also use stereo reconstruction and semi-global matching. In their results,
 they report achieving a better Mean Absolute Error (MAE) when combining LiDAR data
-with stereo reconstruction, compared to using LiDAR data alone.
+with stereo reconstruction, compared to using LiDAR data alone \cite{uhrig_2017_sparsity}.
 
 The dataset may be downloaded from the official KITTI website\footnote{http://www.cvlibs.net/datasets/kitti/eval\_depth.php}
 using their provided script and is already split into training and validation sets by the authors.
@@ -208,7 +206,7 @@ The ResNet CNN backbone and depth neural network are both a part of the same neu
 
 \section{Implementation} \label{sec:implementation}
 
-As mentioned in the \href{sec:features}{Features} section above, the model consists of "encoder" and "decoder" layers, which is a simplification of the papers that we read in the \href{sec:related-work}{Related Work} section above. The goal of the model is to take in a single RGB image as input and predict a depth value for each pixel. Since this is mono depth perception, the accuracy of each depth value will be measured according to the relative depth in comparison to other pixels in the image. 
+As mentioned in the \href{sec:features}{Features} section above, the model consists of "encoder" and "decoder" layers, which is a simplification of the papers that we read in the \href{sec:related-work}{Related Work} section above. The goal of the model is to take in a single RGB image as input and predict a depth value for each pixel. Since this is monocular depth perception, the accuracy of each depth value will be measured according to the relative depth in comparison to other pixels in the image. 
 
 \subsection{Encoder}
 
@@ -228,7 +226,7 @@ Each input RGB image is resized and normalized using mean and standard deviation
 
 The model is trained using supervised learning, where the model's predicted depth map is compared to the ground-truth depth using scale-invariant loss. The reason scale-invariant loss function was used in this case, was to make it easier to benchmark this model against the other ones mentioned in the \href{sec:related-work}{Related Work} section above. 
 
-Moreover, it is important to note that the predicted depth map is scaled using the target depth map to prevent large errors caused by the actual depth prediction values being off. Since this project focuses on mono depth perception, and not stereo, our goal is not to get the true depth in meters, but rather to determine whether the relative depth of different pixels is the same as the target.
+Moreover, it is important to note that the predicted depth map is scaled using the target depth map to prevent large errors caused by the actual depth prediction values being off. Since this project focuses on monocular depth perception, and not stereo, our goal is not to get the true depth in meters, but rather to determine whether the relative depth of different pixels is the same as the target.
 
 The model is trained using stochastic gradient descent, training on a batch of 4 images at a time until all 1000 images have been passed through the model. This process is repeated for the set number of epochs defined in the code. 
 
@@ -245,7 +243,7 @@ You can access the full implementation at our \href{https://github.com/alamo3/SF
 %This may take around 0.5 pages.
 
 The loss function used to train the model is the Scale Invariant Loss, which was first defined 
-by Eigen et al. in their 2014 paper "Depth Map Prediction from a Single Image using a Multi-Scale Deep Network".
+by Eigen et al. in their 2014 paper "Depth Map Prediction from a Single Image using a Multi-Scale Deep Network" \cite{eigen_2014_depth}.
 
 It is defined as follows:
 \[
@@ -288,7 +286,25 @@ mentioned in the \href{sec:dataset}{Dataset} section above with a roughly 80/20 
 There is no cross-validation performed due to the sufficiently large size of the dataset.
 However, this experiment was conducted with a 
 very small subset of the entire dataset, using only 1000 images for training due to 
-computational constraints. 
+computational constraints with the following results over 50 epochs:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Metric} & \textbf{Value} \\
+\hline
+Validation Loss (SiLog) & 0.3224 \\
+Training Loss (SiLog) & 0.5668 \\
+Rel Sq & 4.2883 \\
+Abs Rel & 0.4022 \\
+iRMSE & 0.0425 \\
+\hline
+
+\end{tabular}
+\caption{Model Evaluation Metrics on Validation Set after 50 Epochs}
+\label{tab:metrics}
+\end{table}
 
 \section{Feedback and Plans} \label{sec:feedback_and_plans}
 
@@ -296,30 +312,32 @@ computational constraints.
 
 Our first feedback was received during a tutorial when our group proposed to the TA. The TA gave us two pieces of feedback. To look into and base our work off what other work have been done on the subject, and use a Convolutional Neural Network. 
 
-In a call with a TA. They recommended that we should add distribution of distances in the dataset, and a baseline for naive random guess, and maybe a multi layer perceptron (simple model)
+In a call with a TA, they recommended that we should add distribution of distances in the dataset, and a baseline for naive random guess, and maybe a multi layer perceptron (simple model)
 
 Our group knew that there was a lot of previous work done on this subject. We used this to influence how we wanted to approach this problem which was shown in our \href{sec:related-work}{Related Work} section. 
 
-The TAs also mentioned two different methods of implementing our model with both CNNs and MLPs. Our group decide that we wanted to use a CNN specifically ResNet-34 as it was designed to be used for computer vision. However, our group will also use a MLP to use as a baseline and compare to other models 
+The TAs also mentioned two different methods of implementing our model with both CNNs and MLPs. Our group decide that we wanted to use a CNN specifically ResNet-34 as it was designed to be used for complicated perception tasks. However, our group will also use a MLP to use as a baseline and compare to other models 
 
 The last bit of feedback is related to creating a baseline for naive random guess. This is something our group will do as to have a proper comparison for how good our model is. 
 
-Some future plans of our project are to use a larger subset of the KITTI Dataset, as we are currently using a subset. To do this we would use the McMaster servers for computation as the entire dataset is bigger than 100gb and using our own devices would be unreasonable. We will also test different baselines (such as naive guesses and MLPs) and explore other models and different backbones and model configurations (including transformers).
+Some future plans of our project are to use a larger subset of the KITTI Dataset, as we are currently using a very small subset.
+To do this we would use the McMaster servers for computation as the entire dataset is larger than 100GB, and using our own devices would be unreasonable. 
+We will also test different baselines (such as naive guesses and MLPs) and explore other models and different backbones and model configurations including transformers.
 
-
-
-
-\nocite{KITTI, Piccinelli2024UniDepth, Bie2025MultiSpaceDepth, Wang2024DCDepth, Shao2023NDDepth}
 
 \section*{Team Contributions} \label{sec:team_contributions}
-
-Write in this section a few sentences describing the contributions of each team member. What did each member work on? Refer to item 7.
-
+Everyone in the group contributed equally to this project. 
+Omar Alam focused on the dataset research and preprocessing, 
+Nirmal Chaudhary focused on the implementation of the model, 
+and Kevin Zhu focused on researching related works. 
+Everyone contributed to writing the report and editing.
 % Bibliography entries for the entire Anthology, followed by custom entries
 %\bibliography{custom,anthology-overleaf-1,anthology-overleaf-2}
 
 % Custom bibliography entries only
+
 \bibliography{custom}
+
 
 % \appendix
 
