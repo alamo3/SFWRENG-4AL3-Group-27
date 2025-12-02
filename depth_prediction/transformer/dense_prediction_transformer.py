@@ -35,6 +35,14 @@ class DensePredictionTransformer(nn.Module):
             nn.ReLU(inplace=True)
         )
 
+        # Delete the unused classification layers to satisfy DDP
+        if hasattr(self.model, 'head'):
+            del self.model.head  # The classification head
+        if hasattr(self.model, 'norm'):
+            del self.model.norm  # The final normalization layer
+        if hasattr(self.model, 'fc_norm'):
+            del self.model.fc_norm  # FC Norm
+
 
     def forward(self, x):
 
