@@ -97,19 +97,18 @@ def train_transformer_acceleratred():
     for epoch in tqdm(range(EPOCHS)):
         tqdm_dataloader = tqdm(train_loader)
         for step, (inputs, targets) in enumerate(tqdm_dataloader):
+            inputs = inputs.to(accelerator.device)
+            targets = targets.to(accelerator.device)
 
-            # No need for .to(device), accelerator handles it
+            preds = model(inputs)
+            loss = criterion(preds, targets)
 
-            with accelerator.accumulate(model):  # Handles gradient accumulation if needed
-                preds = model(inputs)
-                loss = criterion(preds, targets)
-
-                optimizer.zero_grad()
-                accelerator.backward(loss)  # <--- Replace loss.backward()
-                optimizer.step()
+            optimizer.zero_grad()
+            accelerator.backward(loss)  # <--- Replace loss.backward()
+            optimizer.step()
 
             if step % 10 == 0 and accelerator.is_main_process:
-                print(f"Epoch {epoch} | Step {step} | Loss: {loss.item():.4f}")
+                accelerator.print(f"Epoch {epoch} | Step {step} | Loss: {loss.item():.4f}")
 
     if accelerator.is_main_process:
         print("Training finished.")
