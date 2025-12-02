@@ -15,6 +15,14 @@ class VisionTransformer(nn.Module):
 
         self.embed_dim = self.model.embed_dim
 
+        # Delete the unused classification layers to satisfy DDP
+        if hasattr(self.model, 'head'):
+            del self.model.head  # The classification head
+        if hasattr(self.model, 'norm'):
+            del self.model.norm  # The final normalization layer
+        if hasattr(self.model, 'fc_norm'):
+            del self.model.fc_norm  # FC Norm
+
     def forward(self, x):
 
         # We will convert our input image into a series of 16x16 patches (this is resolution invariant)
