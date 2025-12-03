@@ -7,7 +7,7 @@ class DepthNet(nn.Module):
         super().__init__()
 
         # Encoder: ResNet-34
-        resnet = models.resnet34(weights=models.ResNet34_Weights.IMAGENET1K_V1)
+        resnet = models.resnet50(weights=models.ResNet50_Weights.IMAGENET1K_V1)
 
         # Keep only the convolutional layers
         self.conv1 = resnet.conv1   # (64 channels, /2)
@@ -21,10 +21,10 @@ class DepthNet(nn.Module):
         self.layer4 = resnet.layer4   # 512 channels (/32)
 
         # Decoder
-        self.up4 = self._upsample_block(512, 256)  # /16
-        self.up3 = self._upsample_block(256, 128)  # /8
-        self.up2 = self._upsample_block(128, 64)   # /4
-        self.up1 = self._upsample_block(64, 64)    # /2
+        self.up4 = self._upsample_block(2048, 1024)  # /16
+        self.up3 = self._upsample_block(1024, 512)  # /8
+        self.up2 = self._upsample_block(512, 256)   # /4
+        self.up1 = self._upsample_block(256, 64)    # /2
 
         # Final depth prediction layer
         self.final = nn.Conv2d(64, 1, kernel_size=3, padding=1)

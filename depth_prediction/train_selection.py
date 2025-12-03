@@ -2,6 +2,7 @@ import torch
 from torch.utils.data import DataLoader, random_split
 from models.depth_net import DepthNet
 from data.kitti_selection import KITTIDepthSelectionDataset
+from accelerate import Accelerator
 from tqdm import tqdm
 import os
 
@@ -85,9 +86,12 @@ def evaluate_val_metrics(model, val_loader, device):
 
 
 def train():
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    # device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    dataset = KITTIDepthSelectionDataset("KITTI/selection")
+    accelerator = Accelerator()
+    device = accelerator.device
+
+    dataset = KITTIDepthSelectionDataset("KITTI/KITTI/train")
     train_size = int(0.9 * len(dataset))
     val_size = len(dataset) - train_size
     train_ds, val_ds = random_split(dataset, [train_size, val_size])
@@ -106,7 +110,7 @@ def train():
             pred = model(img)
             loss = scale_invariant_loss(pred, depth)
             optimizer.zero_grad()
-            loss.backward()
+            accelerator.backward(loss)
             optimizer.step()
             pbar.set_postfix({'train loss': f"{loss.item():.4f}"})
     
