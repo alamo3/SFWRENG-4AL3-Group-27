@@ -1,0 +1,423 @@
+\documentclass[11pt]{article}
+
+% Change "review" to "final" to generate the final (sometimes called camera-ready) version.
+% Change to "preprint" to generate a non-anonymous version with page numbers.
+\usepackage[]{acl}
+\usepackage{times}
+\usepackage{latexsym}
+% For proper rendering and hyphenation of words containing Latin characters (including in bib files)
+\usepackage[T1]{fontenc}
+% For Vietnamese characters
+% \usepackage[T5]{fontenc}
+% See https://www.latex-project.org/help/documentation/encguide.pdf for other character sets
+
+% This assumes your files are encoded as UTF8
+\usepackage[utf8]{inputenc}
+\usepackage{microtype}
+\usepackage{inconsolata}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{amsmath}
+
+\setlength{\parindent}{0pt}
+
+% If the title and author information does not fit in the area allocated, uncomment the following
+%
+%\setlength\titlebox{<dim>}
+%
+% and set <dim> to something 5cm or larger.
+
+\title{Group 27 Progress Report:\\Monocular Depth Perception}
+
+
+\author{Omar Alam, Nirmal Chaudhari, Kevin Zhu \\
+  \texttt{\{alamo2,chaudn12,zhuk41\}@mcmaster.ca} }
+
+%\author{
+%  \textbf{First Author\textsuperscript{1}},
+%  \textbf{Second Author\textsuperscript{1,2}},
+%  \textbf{Third T. Author\textsuperscript{1}},
+%  \textbf{Fourth Author\textsuperscript{1}},
+%\\
+%  \textbf{Fifth Author\textsuperscript{1,2}},
+%  \textbf{Sixth Author\textsuperscript{1}},
+%  \textbf{Seventh Author\textsuperscript{1}},
+%  \textbf{Eighth Author \textsuperscript{1,2,3,4}},
+%\\
+%  \textbf{Ninth Author\textsuperscript{1}},
+%  \textbf{Tenth Author\textsuperscript{1}},
+%  \textbf{Eleventh E. Author\textsuperscript{1,2,3,4,5}},
+%  \textbf{Twelfth Author\textsuperscript{1}},
+%\\
+%  \textbf{Thirteenth Author\textsuperscript{3}},
+%  \textbf{Fourteenth F. Author\textsuperscript{2,4}},
+%  \textbf{Fifteenth Author\textsuperscript{1}},
+%  \textbf{Sixteenth Author\textsuperscript{1}},
+%\\
+%  \textbf{Seventeenth S. Author\textsuperscript{4,5}},
+%  \textbf{Eighteenth Author\textsuperscript{3,4}},
+%  \textbf{Nineteenth N. Author\textsuperscript{2,5}},
+%  \textbf{Twentieth Author\textsuperscript{1}}
+%\\
+%\\
+%  \textsuperscript{1}Affiliation 1,
+%  \textsuperscript{2}Affiliation 2,
+%  \textsuperscript{3}Affiliation 3,
+%  \textsuperscript{4}Affiliation 4,
+%  \textsuperscript{5}Affiliation 5
+%\\
+%  \small{
+%    \textbf{Correspondence:} \href{mailto:email@domain}{email@domain}
+%  }
+%}
+
+%\author{
+%  \textbf{First Author\textsuperscript{1}},
+%  \textbf{Second Author\textsuperscript{1,2}},
+%  \textbf{Third T. Author\textsuperscript{1}},
+%  \textbf{Fourth Author\textsuperscript{1}},
+%\\
+%  \textbf{Fifth Author\textsuperscript{1,2}},
+%  \textbf{Sixth Author\textsuperscript{1}},
+%  \textbf{Seventh Author\textsuperscript{1}},
+%  \textbf{Eighth Author \textsuperscript{1,2,3,4}},
+%\\
+%  \textbf{Ninth Author\textsuperscript{1}},
+%  \textbf{Tenth Author\textsuperscript{1}},
+%  \textbf{Eleventh E. Author\textsuperscript{1,2,3,4,5}},
+%  \textbf{Twelfth Author\textsuperscript{1}},
+%\\
+%  \textbf{Thirteenth Author\textsuperscript{3}},
+%  \textbf{Fourteenth F. Author\textsuperscript{2,4}},
+%  \textbf{Fifteenth Author\textsuperscript{1}},
+%  \textbf{Sixteenth Author\textsuperscript{1}},
+%\\
+%  \textbf{Seventeenth S. Author\textsuperscript{4,5}},
+%  \textbf{Eighteenth Author\textsuperscript{3,4}},
+%  \textbf{Nineteenth N. Author\textsuperscript{2,5}},
+%  \textbf{Twentieth Author\textsuperscript{1}}
+%\\
+%\\
+%  \textsuperscript{1}Affiliation 1,
+%  \textsuperscript{2}Affiliation 2,
+%  \textsuperscript{3}Affiliation 3,
+%  \textsuperscript{4}Affiliation 4,
+%  \textsuperscript{5}Affiliation 5
+%\\
+%  \small{
+%    \textbf{Correspondence:} \href{mailto:email@domain}{email@domain}
+%  }
+%}
+
+\begin{document}
+\maketitle
+% \begin{abstract}
+% \end{abstract}
+
+\section{Introduction}
+
+As researchers are looking for more ways for computers to read the environment, depth perception is becoming an increasingly important feature. Traditionally, depth perception is done with LIDAR and radar. Lidar and radar-based sensors are accurate at long ranges but are more expensive compared to camera-based setups. Cameras, on the other hand do not have proper depth perception without the use of multiple lenses creating a stereo setup. Even then, stereo setups are less accurate than LiDAR or radar. 
+
+To attempt the accuracy of LIDAR setups without needing use LIDAR, we are using deep learning techniques to create a model that can predict distances on an image. The model will be trained on taken images along with corresponding distances measured from more accurate LIDAR sources. This problem is still considered an unsolved research problem since it is extremely difficult for models to learn to estimate depth accurately enough for robotics applications using a single image only. 
+
+If the single image depth perception is solved effectively with a robust solution, it will be impactful in many fields, with the primary use being for autonomous features in vehicles. As these vehicles need a large suite of sensors to properly detect their environment, its possible cut costs by reduce the number of sensors needed for proper autonomous function. Cheaper and more accessible depth perception would also encourage other companies to consider and integrate it into products.
+
+There are numerous groups of people and institutions that experimented with unique methods for monocular depth prediction, particularly using the same KITTI dataset described in the section \href{sec:dataset}{below}. In fact, on the website that was used to retrieve this dataset, there is a leaderboard outlining which methods yield the best results \citep{KITTI}. These methods were explored by our team to understand the approaches that obtain the best result. Although the related works were used as inspiration, the purpose of this project is to experiment and find unique ways to improve on existing methods. 
+
+While looking into related work, we realized some approaches were training a model to analyze stereo depth perception instead of monocular. These approaches were ignored for the purpose of this project since the focus is on monocular depth perception. But the comparison of backbones used between stereo versus monocular approaches was interesting. Since, the initial assumption was that for monocular depth perception a more expressive backbone would be needed since it can't use parallax method. However, this wasn't really mentioned in any of the papers. 
+
+For the initial implementation, we decided to focus on approaches that use a CNN to extract features before passing them into a Neural Network. Namely, the MSFusion, DCDepth and NDDepth approaches. The UniDepth approach sparked inspiration to look into using a transformer later on for improvement. 
+\begin{itemize}
+  \item UniDepth: Uses a ViT-based DPT (Dense Prediction Transformer) backbone. For the decoder, it uses a DPT-style multi-scale fusion decoder. For the depth representation, it predicts a pseudo-spherical 3D representation. \citep{Piccinelli2024UniDepth}. 
+  \item MSFusion: Uses a standard ResNet50-based encoder backbone to extract 2D texture features. It also converts the image into a 3D point cloud representation. It then uses a multi-space fusion decoder to fuse both into a spatial feature map. For depth representation, it outputs the actual depth prediction \citep{Bie2025MultiSpaceDepth}.
+  \item DCDepth: Uses a standard ResNet or HRNet backbone to extract 2D image features from RGB image. The decoder outputs DCT frequency coefficients for each depth patch. Uses inverse DCT to transform the coefficients into a pixel-wise depth as the depth representation \citep{Wang2024DCDepth}.
+  \item NDDepth: Uses a standard ResNet-based backbone to extract 2D image features from RGB image. The decoder branches into two prediction heads, the normal distance head and the direct depth head. The depth representation is the true depth in meters, which is derived by selecting which head to trust per pixel \citep{Shao2023NDDepth}.
+  \item PixelFormer: The encoder here extracts multi-scale image features. The decoder then takes these pixel-level features and progressively increases spatial resolution using Skip Attention Module. To predict depth bins, it performs ordinal regression. \citep{Agarwal2023Attention}
+  \item DepthFormer: Uses dual-branch or parallel encoders, consisting of a transformer branch and CNN branch. Transformer handles global context, and long-range correlation. Convolution branch preserves local information. The decoder is then a neural network that maps the two feature sets into a depth map \citep{Li2023DepthFormer}
+\end{itemize}
+
+\subsection*{Post Progress Report}
+
+For the initial implementation, we mainly focused on the MSFusion, DCDepth and NDDepth approaches, which all use a ResNet backbone. However, since the accuracy of our model was a lot worse than the other approaches, we knew we had to make a change. 
+
+After the progress report, the PixelFormer and DepthFormer projects made us look into using transformers as the backbone to extract features instead of a CNN to extract the features. After reading those papers, we realized vision transformers are able to capture long-range dependencies without needing many convolutional layers. The DepthFormer article was particularly interesting since it involved extracting features using CNN and transformers in parallel. Allowing us to capture fine-grained and long-range features simultaneously. However, we didn't have enough time to explore that, so we decided to just look at how vision transformers compared to using CNN as the backbone. 
+
+\section{Dataset} \label{sec:dataset}
+
+%You should write about your dataset here, following the guidelines 
+%regarding item 1. This section may be 0.5-1 pages. Depending on your 
+%specific dataset, you may want to include subsections for the preprocessing, 
+%annotation, etc.
+
+The monocular depth perception project is using the KITTI Depth Vision Benchmark Suite. 
+This dataset contains over 93,000 gray scale depth maps along with corresponding
+RGB images and LiDAR scans. The LiDAR scans provide accurate depth information 
+which is used to generate the ground truth depth maps. The resolution of the RGB images
+is 1242 x 375 pixels with 3 color channels for red, green, and blue. The depth maps
+are single channel images with the same resolution as the RGB images, where each pixel
+value represents the distance from the camera to the object in meters up to a 80 meter maximum.
+
+The following images are a single example from the dataset.
+\begin{figure}[H]
+  \includegraphics[width=\columnwidth]{rgb_image_0.png}
+  \caption{An example RGB image from the KITTI dataset.}
+  \label{fig:kitti_rgb}
+\end{figure}
+\vspace{-20pt}
+\begin{figure}[H]
+  \includegraphics[width=\columnwidth]{depth_map_0-modified.png}
+  \caption{The corresponding ground truth depth map for the RGB image in Figure~\ref{fig:kitti_rgb}. (Inverted for visualization purposes)}
+  \label{fig:kitti_depth}
+\end{figure}
+
+The depth maps in the KITTI dataset have some missing values due 
+to the limitations of the LiDAR sensor. The point clouds generated by 
+the LiDAR tend to be sparse, especially for objects that are far away from the sensor.
+Since the KITTI dataset also contains stereo images, the authors of the dataset
+also use stereo reconstruction and semi-global matching. In their results,
+they report achieving a better Mean Absolute Error (MAE) when combining LiDAR data
+with stereo reconstruction, compared to using LiDAR data alone \cite{uhrig_2017_sparsity}.
+
+The dataset may be downloaded from the official KITTI website\footnote{http://www.cvlibs.net/datasets/kitti/eval\_depth.php}
+using their provided script and is already split into training and validation sets by the authors.
+To retrieve the required dataset, the raw RGB images must be downloaded
+separately from the depth maps. Some preprocessing was required to remove
+RGB images that did not have corresponding depth maps. 
+
+A preliminary analysis of 1000 images from the training set shows
+the following depth distribution in the dataset:
+\begin{figure}[H]
+  \includegraphics[width=\columnwidth]{distance_distrib.png}
+  \caption{Depth distribution of 1000 images from the KITTI dataset.}
+  \label{fig:depth_distribution}
+\end{figure}
+
+As shown in Figure~\ref{fig:depth_distribution}, the depth values present
+in the dataset are moderately skewed towards closer objects with frequency 
+decreasing as depth increases.
+
+\subsection*{Post Progress Report}
+
+For the initial implementation, we were only using a very small subset of the KITTI dataset we mentioned. To improve the overall accuracy, we decided on using the full dataset, which was at least 20 times larger. This also ensured that our benchmark was being compared against accurately, since it doesn't make sense to compare a model that was trained on a subset of the dataset against a model that was trained on the full dataset. As such, now that we used the entire dataset, we can compare more confidently against the other approaches. 
+
+\section{Features and Inputs} \label{sec:features}
+
+% TODO: Need to update
+
+For the implementation, no feature engineering or feature selection is being done. The model simply takes in an RGB image as input and processes it through a ResNet Convolutional Neural Network backbone. This transforms the pixels data into learned feature embeddings space. As such, since the backbone is an off-the-shelf CNN that learns feature representation directly from the incoming data, there is no manual feature selection needed. The exact implementation details of the backbone into the overall Neural Network model will be described in the section \href{sec:implementation}{below}. 
+
+The use of a ResNet CNN backbone is similar to what other related works like DCDepth, MSFusion and NDDepth did as described in \href{sec:features}{section 2}, where features and correlations are dynamically extracted. The reason this works well, as opposed to manually selecting features is because the correlations between various features change a lot based on the image that is presented. As such, we need a model that captures geometric and semantic cues that are hard to generalize as hard-coded features. Evidently a CNN is needed to extract the features themselves. 
+
+The ResNet CNN backbone and depth neural network are both a part of the same neural network, but separated as stages in the overall structure. The CNN backbone serves as the "encoder" stage of the overall neural network, where it is a CNN that outputs the learned feature embeddings space. These features are then passed into the "decoder" layer which upsamples the embeddings to return a depth map that is the same size as the original RGB image.
+
+\section{Implementation} \label{sec:implementation}
+
+% TODO: Need to complete
+
+\section{Evaluation} \label{sec:results_and_evaluation}
+
+%How are you evaluating your model? What results do 
+%you have so far? What are your baselines? Refer to item 5. 
+%This may take around 0.5 pages.
+% TODO: NEED TO UPDATE
+
+The loss function used to train the model is the Scale Invariant Loss, which was first defined 
+by Eigen et al. in their 2014 paper "Depth Map Prediction from a Single Image using a Multi-Scale Deep Network" \cite{eigen_2014_depth}.
+
+It is defined as follows:
+\[
+  D(y, y^*) = \frac{1}{n} \sum_{i=0}^{n} d_{i}^2 - \frac{1}{n^2} (\sum_{i=0}^{n} d_i)^2
+\]
+
+Where $d_i = \log y_i - \log y_i^*$, $y_i$ is the predicted depth, $y_i^*$ is the ground truth depth, and $n$ is the number of pixels in the depth map.
+
+This function is particularly useful for evaluating the quality of the depth estimation 
+since it focuses on the relative differences between predicted and ground truth depths,
+rather than absolute differences. This is important since depth predictions can vary
+by a scale factor as long as the relative distances between objects are preserved.
+Ex: If the predicted depth is consistently twice the ground truth depth, the scale invariant loss will be low, indicating that the model has learned
+the relative depth relationships correctly.
+
+In addition to using SiLog, the following metrics are also used:
+\begin{enumerate}
+  \item Absolute Relative Difference (Abs Rel):
+  \[
+    \text{Abs Rel} = \frac{1}{n} \sum_{i=0}^{n} \frac{|y_i - y_i^*|}{y_i^*}
+  \]
+
+  \item Relative Squared Difference (Rel Sq):
+  \[
+    \text{Rel Sq} = \frac{1}{n} \sum_{i=0}^{n} \frac{(y_i - y_i^*)^2}{(y_i^*)^2}
+  \]
+
+  \item Inverse Root Mean Squared Error (iRMSE):
+  \[
+    \text{iRMSE} = \sqrt{\frac{1}{n} \sum_{i=0}^{n} \left(\frac{1}{y_i} - \frac{1}{y_i^*}\right)^2}
+  \]
+\end{enumerate}
+These metrics provide a comprehensive evaluation of the model's performance.
+The iRMSE metric is particularly useful for determining depth accuracy for closer objects.
+It penalizes large errors in depth estimation for nearby objects more heavily than for distant objects,
+since it is based on the inverse of depth values.
+
+The dataset is already split into training and validation sets by the authors of the KITTI dataset as 
+mentioned in the \href{sec:dataset}{Dataset} section above with a roughly 80/20 split.
+There is no cross-validation performed due to the sufficiently large size of the dataset.
+
+\subsection*{Initial Implementation Evaluation}
+This experiment was conducted with a 
+very small subset of the entire dataset, using only 1000 images for training due to 
+computational constraints with the following results over 50 epochs. This implementation was the result of using a ResNet34 backbone to extract the features.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Metric} & \textbf{Value} \\
+\hline
+Validation Loss (SiLog) & 0.3224 \\
+Training Loss (SiLog) & 0.5668 \\
+Rel Sq & 4.2883 \\
+Abs Rel & 0.4022 \\
+iRMSE & 0.0425 \\
+\hline
+
+\end{tabular}
+\caption{ResNet34 Model Evaluation Metrics on Validation Set after 50 Epochs}
+\label{tab:metrics}
+\end{table}
+
+\begin{figure}[H]
+  \includegraphics[width=\columnwidth]{resnet34.png}
+  \caption{Resnet34 Model Comparison}
+  \label{fig:resnet34_comparison}
+\end{figure}
+
+\subsection*{ResNet50 Implementation Evaluation}
+This experiment was conducted with the entire dataset this time, with a change in the backbone being used. Instead of using a Resnet34 backbone, we decided on using a ResNet50 backbone, since that's the backbone that is used in the approaches we saw. And also it is a wider and deeper CNN compared to the ResNet34. 
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Metric} & \textbf{Value} \\
+\hline
+Validation Loss (SiLog) & 0.3404 \\
+Training Loss (SiLog) & 0.2315 \\
+Rel Sq & 4.5360 \\
+Abs Rel & 0.3832 \\
+iRMSE & 0.0455 \\
+\hline
+
+\end{tabular}
+\caption{ResNet50 Model Evaluation Metrics on Validation Set after 50 Epochs}
+\label{tab:metrics}
+\end{table}
+
+\begin{figure}[H]
+  \includegraphics[width=\columnwidth]{resnet50.png}
+  \caption{Resnet50 Model Comparison}
+  \label{fig:resnet50_comparison}
+\end{figure}
+
+The results are very similar to just using the ResNet34 backbone. Perhaps since it was trained on a much larger dataset compared to the ResNet34 model, it has a lower accuracy, since it is unable to accurately fit and learn all the datapoints. 
+
+\subsection*{Vision Transformer Implementation Evaluation}
+
+This evaluation is for the vision transformer, which has been described in the Implementation section above. 
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Metric} & \textbf{Value} \\
+\hline
+Validation Loss (SiLog) & 0.0033815 \\
+Training Loss (SiLog) & 0.001112 \\
+Rel Sq & 0.09019 \\
+Abs Rel & 0.03577 \\
+iRMSE & 0.004587 \\
+\hline
+
+\end{tabular}
+\caption{Vision Transformer Model Evaluation Metrics on Validation Set after 50 Epochs}
+\label{tab:metrics}
+\end{table}
+
+\begin{figure}[H]
+  \includegraphics[width=\columnwidth]{transformer.png}
+  \caption{Transformer Model Comparison}
+  \label{fig:transformer_comparison}
+\end{figure}
+
+These results show a much higher accuracy compared to the ResNet50 model, which can also visually be seen when comparing Figure 6 against Figure 5.
+
+\section{Progress} \label{sec:progress}
+
+For the final implementation, we stayed on track with what we had planned in the progress report. Although we used a ResNet34 model in the initial implementation, we always planned to first experiment with using a ResNet50 and then a Vision Transformer backbone. Both of these modifications were inspired by the approaches we saw in the papers listed in the Introduction section. 
+\\\\
+This being said, we were quite surprised when the ResNet50 backbone model performed equally well to the Resnet34 backbone model despite the backbone being wider and deeper. This was one aspect that made us look into more papers like the DepthFormer to see what advantages CNN backbones have against transformer backbones. 
+\\\\
+Moreover, we also followed through with our goal of using the entire KITTI dataset, instead of just using a subset to ensure we can confidently compare our model against the ones listed in the approaches section of the KITTI website. 
+
+\section{Error Analysis} \label{sec:error_analysis}
+
+The error was analyzed by comparing the 5 metrics outlined in the Evaluation section against the benchmarks on the KITTI website. 
+\\\\
+Each metric defines a unique error that outlines what the model is doing well or poorly in. We used these metrics to determine what the next change we should make is.
+
+\subsection*{SiLog - Scale Invariant Log Loss}
+
+This is one of the main errors we are using to determine how well the model is performing since it gives a key piece of information; is the model overfitting the dataset?
+Measures the difference between predicted and true depth in the log-space. This makes it less sensitive to absolute depth scale. 
+\\\\
+Since we are working with monotonic depth perception here, it is important to compare the loss from a relative depth accuracy space, since we are less concerned with the true depth value, and more concerned with how the depth of each pixel compares with the ones around it. 
+\\\\
+We are actually using this metric to measure the validation and training loss, and hence this metric is being directly used to train the model itself. 
+\\\\
+To systematically determine whether the model is performing well in this case, the key thing we look at is whether or not the model is overfitting or underfitting the dataset. In the case of the Transformer Model, it doesn't appear to be doing that. However, there is a much larger gap between validation and training loss for ResNet34 and ResNet50, which implies there is some overfitting happening there. As such, it's possible the ResNet50 model is outputting features that act as noise, and the model is learning them. Whereas the transformer model isn't doing that, so it only fits on the more meaningful features. 
+
+\subsection*{Rel Sq - Squared Relative Error}
+
+This error is sensitive to errors on far objects. However, since we are dealing with Monodepth perception, it makes sense if this error is higher compared to other metrics, since again, we are dealing with relative depth of each pixel to others. 
+\\\\
+As such, for the purpose of this project, since we are only focusing on monodepth perception, we never really paid too much attention to this value alone. But, it being higher than the other ones is a good indication that although our model is good at determining the relative depth of pixels, it cannot accurately determine the true depth value. 
+\\\\
+When comparing this metric against other ones in the KITTI benchmark table, our value of approximately 0.09 is a lot larger than the best model on the list which is 0.006. Since that deals with stereo depth perception. 
+
+\subsection*{Abs Rel - Absolute Relative Error}
+
+Similar to the SiLog metric, this metric analyzes the absolute depth error relative to the ground truth. So, it essentially looks at on average how far the prediction is proportionally, regardless of the true depth value, which is perfect for mono-depth perception. 
+\\\\
+This metric was used primarily to compare how this model performs relative to the other models on the KITTI benchmark list, since even if a model on that list uses stereo depth perception, this metric still only measures the relative depth values instead of absolute. 
+\\\\
+To systematically determine whether a model is performing well in this case, we want to make this value as low as possible since that implies the relative depth of each pixel is accurate, which is what we need in mono depth perception.
+
+\subsection*{iRMSE - Inverse Root Mean Squared Error}
+
+This metric measures whether the model is precise on near objects and edges. It serves the opposite function of the Squared Relative Error, which although important for concepts like Stereo depth perception, was ignored in our case since we are only focusing on the depth of pixels relative to each other. 
+
+
+
+\section*{Team Contributions} \label{sec:team_contributions}
+Everyone in the group contributed equally to this project. 
+Omar Alam focused on developing the transformer model, 
+Nirmal Chaudhari focused on experimenting with different ResNet model backbones, 
+and Kevin Zhu focused on researching related works. 
+Everyone contributed to writing the report and editing.
+% Bibliography entries for the entire Anthology, followed by custom entries
+%\bibliography{custom,anthology-overleaf-1,anthology-overleaf-2}
+
+% Custom bibliography entries only
+
+\bibliography{custom}
+
+
+% \appendix
+
+% \section{Example Appendix}
+% \label{sec:appendix}
+
+% This is an appendix.
+
+\end{document}
