@@ -1,5 +1,6 @@
 import os
 import numpy as np
+from pathlib import Path
 from PIL import Image
 from torch.utils.data import Dataset
 from torchvision import transforms
@@ -7,39 +8,52 @@ import torch
 
 class KITTIDepthSelectionDataset(Dataset):
     def __init__(self, root_dir):
-        self.image_dir = os.path.join(root_dir, "image")
-        self.depth_dir = os.path.join(root_dir, "depth")
-
-        self.images = sorted(os.listdir(self.image_dir))
-        self.depths = sorted(os.listdir(self.depth_dir))
-
+        self.root_dir = Path(root_dir)
         self.img_transform = transforms.Compose([
             transforms.Resize((192, 640)),
             transforms.ToTensor(),
-            transforms.Normalize([0.45,0.45,0.45],[0.225,0.225,0.225]),
+            transforms.Normalize([0.45, 0.45, 0.45], [0.225, 0.225, 0.225]),
         ])
 
+        self.pairs = []
+        for img_path in sorted(self.root_dir.glob("**/image_0[23]/data/*.png")):
+            depth_path = self._find_depth_for_img(img_path)
+            if depth_path is None:
+                continue
+            self.pairs.append((img_path, depth_path))
+
+        if not self.pairs:
+            raise RuntimeError(f"No image/depth pairs found under {self.root_dir}")
+
+    def _find_depth_for_img(self, img_path: Path) -> Path | None:
+        # img_path looks like .../<drive>/image_0X/data/<frame>.png
+        drive_dir = img_path.parents[2]
+        cam = img_path.parent.parent.name  # image_02 or image_03
+        fname = img_path.name
+
+        candidates = [
+            drive_dir / "proj_depth" / "groundtruth" / cam / fname,
+            drive_dir / "groundtruth_depth" / cam / "data" / fname,
+            drive_dir / "depth" / cam / "data" / fname,
+        ]
+        for cand in candidates:
+            if cand.exists():
+                return cand
+        return None
+
     def __len__(self):
-        return len(self.images)
+        return len(self.pairs)
 
     def __getitem__(self, idx):
-        # ---- Load RGB ----
-        img = Image.open(os.path.join(self.image_dir, self.images[idx])).convert("RGB")
+        img_path, depth_path = self.pairs[idx]
+
+        img = Image.open(img_path).convert("RGB")
         img = self.img_transform(img)
 
-        # ---- Load Depth (16-bit PNG) ----
-        depth = Image.open(os.path.join(self.depth_dir, self.depths[idx]))
-
-        # Convert to float meters *before resize*
+        depth = Image.open(depth_path)
         depth = np.array(depth).astype(np.float32) / 256.0
-
-        # Convert back to PIL for resizing
         depth = Image.fromarray(depth)
-
-        # Resize *with nearest neighbor to avoid interpolation artifacts*
         depth = depth.resize((320, 96), Image.NEAREST)
-
-        # Convert to Tensor
         depth = torch.from_numpy(np.array(depth)).unsqueeze(0)
 
         return img, depth
