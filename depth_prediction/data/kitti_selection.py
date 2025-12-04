@@ -8,14 +8,6 @@ import torch
 
 class KITTIDepthSelectionDataset(Dataset):
     def __init__(self, root_dir):
-        """
-        root_dir should point at the KITTI split (e.g., depth_prediction/KITTI/KITTI/train).
-        Expects images under **/image_0*/data/*.png and depth maps stored alongside each drive
-        in one of these common KITTI layouts:
-          - <drive>/proj_depth/groundtruth/image_0X/<file>.png
-          - <drive>/groundtruth_depth/image_0X/data/<file>.png
-          - <drive>/depth/image_0X/data/<file>.png
-        """
         self.root_dir = Path(root_dir)
         self.img_transform = transforms.Compose([
             transforms.Resize((192, 640)),
