@@ -1,6 +1,7 @@
 import torch
 from torch.utils.data import DataLoader, random_split
 from models.mlp_perception import MLP_perception
+from models.depth_net import DepthNet
 from data.kitti_selection import KITTIDepthSelectionDataset
 from tqdm import tqdm
 import os
@@ -97,7 +98,7 @@ def train():
     train_loader = DataLoader(train_ds, batch_size=4, shuffle=True, num_workers=0)
     val_loader   = DataLoader(val_ds, batch_size=4, shuffle=False, num_workers=0)
 
-    model = MLP_perception().to(device)
+    model = DepthNet().to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
 
     for epoch in range(50):
