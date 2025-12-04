@@ -11,13 +11,9 @@ class FusionBlock(torch.nn.Module):
 
         # Standard residual block layout from resnet.
         self.conv1 = torch.nn.Conv2d(channels, channels, kernel_size=3, padding=1)
-
         self.bn1 = torch.nn.BatchNorm2d(channels)
-
         self.relu = torch.nn.ReLU(inplace=True)
-
         self.conv2 = torch.nn.Conv2d(channels, channels, kernel_size=3, padding=1)
-
         self.bn2 = torch.nn.BatchNorm2d(channels)
 
 
