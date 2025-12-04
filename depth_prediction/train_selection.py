@@ -1,6 +1,6 @@
 import torch
 from torch.utils.data import DataLoader, random_split
-from models.depth_net import DepthNet
+from models.mlp_perception import MLP_perception
 from data.kitti_selection import KITTIDepthSelectionDataset
 from tqdm import tqdm
 import os
@@ -9,7 +9,9 @@ def scale_invariant_loss(pred, target):
     valid = target > 0
     pred = torch.clamp(pred, min=1e-3)
     target = torch.clamp(target, min=1e-3)
-
+    
+    #print (pred.size())
+    #print (target.size())
     pred = pred[valid]
     target = target[valid]
 
@@ -95,7 +97,7 @@ def train():
     train_loader = DataLoader(train_ds, batch_size=4, shuffle=True, num_workers=0)
     val_loader   = DataLoader(val_ds, batch_size=4, shuffle=False, num_workers=0)
 
-    model = DepthNet().to(device)
+    model = MLP_perception().to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
 
     for epoch in range(50):
@@ -104,6 +106,7 @@ def train():
         for img, depth in pbar:
             img, depth = img.to(device), depth.to(device)
             pred = model(img)
+            
             loss = scale_invariant_loss(pred, depth)
             optimizer.zero_grad()
             loss.backward()
