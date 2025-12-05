@@ -423,6 +423,9 @@ the \href{sec:results_and_evaluation}{results} section.
 
 \subsection{Baseline Models}
 
+To help evaluate our model we decided create some baseline models. The first baseline model created was a model that would return a linear random value between 0 and 1 representing the minimum and maximum depth possible at each pixel. The second baseline model always returned only zeros, assuming that the depth will always be as close as possible. As the depth distribution favors numbers closer to zero this should have better results than the fully random model and works as a better baseline.
+
+
 \subsection{Engineering Challenges}
 To successfully train the transformer DepthNet, significant 
 engineering challenges needed to be resolved. Training such a 
