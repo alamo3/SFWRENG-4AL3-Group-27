@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
 
-class RandomClassifierBaseline(nn.Module):
+class ZeroBaseline(nn.Module):
     def __init__(self):
-        super(RandomClassifierBaseline, self).__init__()
+        super(ZeroBaseline, self).__init__()
         torch.random.seed = 2147483647
     def forward(self, x):
         

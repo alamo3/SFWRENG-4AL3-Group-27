@@ -59,10 +59,14 @@
 
 
 \author{Omar Alam, Nirmal Chaudhari, Kevin Zhu \\
-  \texttt{\{alamo2,chaudn12,zhuk41\}@mcmaster.ca} }
+  \texttt{\{alamo2,chaudn12,zhuk41\}@mcmaster.ca} \\  
+  \href{https://github.com/alamo3/SFWRENG-4AL3-Group-27}{GitHub}
+  }
+
 
 \begin{document}
 \maketitle
+
 % \begin{abstract} \end{abstract}
 
 \section{Introduction}
@@ -238,7 +242,7 @@ architectures, these extracted features are passed to a decoder network. No
 other pre-processing or feature engineering is applied to the input datsaset.
 
 The exact implementation of these architectures will be detailed in the
-\href{sec:implementation}{ implementation } section.
+\href{sec:implementation}{ implementation} section.
 
 
 \section{Implementation} \label{sec:implementation}
@@ -309,7 +313,36 @@ results from using either of these backbones and the decoder architecture
 described are very similar. This suggests that the jump from 34 to 50 layers did
 not significantly improve the pretrained model's ability to distinguish features
 critical to depth. If this was the case, the weights of the layers extracted
-from the ResNet-50 model should yield a lower error which they do not. 
+from the ResNet-50 model should yield a lower error which they do not
+. 
+\subsection{Multi-layered Perceptron Hybrid}
+
+Another method tried was using a Multi-layered Perceptron (MLP). MLPs are not efficient or designed for image processing as that utilize many fully connected layers. As we still wanted to have another method to compare to, we decided to implement the MLP after extracting features from images. We did this by using multiple layers of convolution to extract features and scale each pixel to include nearby features, giving each pixel 128 features to train the MLP on.
+
+\begin{lstlisting}[language=Python]
+# CNN feature extractor
+self.cnn = nn.Sequential(
+    nn.Conv2d(3, 32, 3, padding=1),  # input RGB
+    nn.ReLU(),
+    nn.Conv2d(32, 64, 3, padding=1),
+    nn.ReLU(),
+    #nn.MaxPool2d(2),  # downsample
+    nn.Conv2d(64, 128, 3, padding=1),
+    nn.ReLU(),
+    nn.MaxPool2d(2))
+\end{lstlisting}
+The model then feeds each pixel and related features into a fully connced hidden layer, and uses that to calculate the estimated depth. 
+
+\begin{lstlisting}[language=Python]
+#MLP per-pixel
+self.mlp = nn.Sequential(
+    nn.Linear(128, 64),
+    nn.ReLU(),
+    nn.Linear(64, 1)  # depth output)
+\end{lstlisting}
+
+
+
 
 \subsection{Vision Transformer Depth Net}
 
@@ -422,6 +455,11 @@ better than convolutional layers and this major difference will be reflected in
 the \href{sec:results_and_evaluation}{results} section.
 
 \subsection{Baseline Models}
+
+To help evaluate our model we decided create some baseline models. The first baseline model created was a model that would return a linear random value between 0 and 1 representing the minimum and maximum depth possible at each pixel. The second baseline model always returned only zeros, assuming that the depth will always be as close as possible. As the depth distribution favours numbers closer to zero this should have better results than the fully random model and works as a better baseline.
+
+Other usable baselines can be found on the KITTI website and can be used to compare our method to other methods that have been published with accompanying papers, results and environments. Note that the numbers on this site are multiplied by compared to the values we are using. 
+
 
 \subsection{Engineering Challenges}
 To successfully train the transformer DepthNet, significant 
@@ -559,6 +597,28 @@ The results are very similar to just using the ResNet34 backbone. Perhaps since
 it was trained on a much larger dataset compared to the ResNet34 model, it has a
 lower accuracy, since it is unable to accurately fit and learn all the
 datapoints. 
+\subsection*{MLP Hybrid Evaluation}
+As our MLP Hybrid hides lots of data due to efficiency constraints, to first gauge the effectiveness by training the dataset on the same 1000 images as the Initial Implementation. The results are the results of training the MLP model for 8 epochs. The model was stopped at 8 due to poor training time and the performance metrics not improving. The performance was also lacking even though it is comparable to the previous ResNet implementations. 
+
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Metric} & \textbf{Value} \\
+\hline
+Validation Loss (SiLog) & 0.2551 \\
+Training Loss (SiLog) & 0.5040 \\
+Rel Sq & 3.8085 \\
+Abs Rel & 0.3608 \\
+iRMSE & 0.0397 \\
+\hline
+
+\end{tabular}
+\caption{MLP Model Evaluation Metrics on Validation Set after 8 Epochs}
+\label{tab:metrics}
+\end{table}
+
 
 \subsection*{Vision Transformer Implementation Evaluation}
 
@@ -598,6 +658,49 @@ being there based on the image alone and incorporates them into the depth map.
 This result is technically "better" than the ground truth. This could lead to
 unforeseen penalization of the model by the loss function. This may be avoided in
 the future by using better datasets. 
+
+\subsection*{Baseline Evaluation}
+The evaluation of the linearly random baseline, which has been described above.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Metric} & \textbf{Value} \\
+\hline
+Validation Loss (SiLog) & 1.3207 \\
+Rel Sq & 8.4483 \\
+Abs Rel & 0.6587 \\
+iRMSE & 1.9262 \\
+\hline
+
+\end{tabular}
+\caption{Linear Random Baseline Evaluation Metrics }
+\label{tab:metrics}
+\end{table}
+
+The evaluation of the zero baseline which always returns zero depth.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Metric} & \textbf{Value} \\
+\hline
+Validation Loss (SiLog) & 0.3345 \\
+Rel Sq & 4.4797 \\
+Abs Rel & 0.4094 \\
+iRMSE & 0.0432 \\
+\hline
+
+\end{tabular}
+\caption{Zero Baseline Evaluation Metrics }
+\label{tab:metrics}
+\end{table}
+
+The results of the baseline show that our initial ResNet attempts, while better than a random depth map are not good models as they are comparable to the zero baseline. However, the vision transformer model is not only better than our initial attempts it is also much better than the baselines, meaning that the model is properly evaluating depth as compared to the previous models. 
+
+Comparing our values to the benchmarks on the KITTI website gives us similar results as our benchmarks. Our initial models were bad and had a SILog of almost 2x the worst model published on the website. However, the vision transformer model did much better with a SiLog of 0.0033815 or 0.33815 as would be displayed on the website.
 
 \section{Progress} \label{sec:progress}
 
