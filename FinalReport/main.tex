@@ -59,10 +59,14 @@
 
 
 \author{Omar Alam, Nirmal Chaudhari, Kevin Zhu \\
-  \texttt{\{alamo2,chaudn12,zhuk41\}@mcmaster.ca} }
+  \texttt{\{alamo2,chaudn12,zhuk41\}@mcmaster.ca} \\  
+  \href{https://github.com/alamo3/SFWRENG-4AL3-Group-27}{GitHub}
+  }
+
 
 \begin{document}
 \maketitle
+
 % \begin{abstract} \end{abstract}
 
 \section{Introduction}
@@ -425,6 +429,8 @@ the \href{sec:results_and_evaluation}{results} section.
 
 To help evaluate our model we decided create some baseline models. The first baseline model created was a model that would return a linear random value between 0 and 1 representing the minimum and maximum depth possible at each pixel. The second baseline model always returned only zeros, assuming that the depth will always be as close as possible. As the depth distribution favours numbers closer to zero this should have better results than the fully random model and works as a better baseline.
 
+Other usable baselines can be found on the KITTI website and can be used to compare our method to other methods that have been published with accompanying papers, results and environments. Note that the numbers on this site are multiplied by compared to the values we are using. 
+
 
 \subsection{Engineering Challenges}
 To successfully train the transformer DepthNet, significant 
@@ -642,6 +648,8 @@ iRMSE & 0.0432 \\
 \end{table}
 
 The results of the baseline show that our initial attempts, while better than a random depth map are not good models as they are comparable to the zero baseline. However, the vision transformer model is not only better than our initial attempts it is also much better than the baselines, meaning that the model is properly evaluating depth as compared to the previous models. 
+
+Comparing our values to the benchmarks on the KITTI website gives us similar results as our benchmarks. Our initial models were bad and had a SILog of almost 2x the worst model published on the website. However, the vision transformer model did much better with a SiLog of 0.0033815 or 0.33815 as would be displayed on the website.
 
 \section{Progress} \label{sec:progress}
 
