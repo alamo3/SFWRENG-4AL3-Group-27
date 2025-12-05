@@ -317,7 +317,7 @@ from the ResNet-50 model should yield a lower error which they do not
 . 
 \subsection{Multi-layered Perceptron}
 
-Another method tried was using a Multi-layered Perceptron (MLP). While MLPs are not vary efficient or designed for image processing we wanted to have another method to compare to. It extracts features from images by using multiple layers of convolution to extract features and scale each pixel to include nearby features. 
+Another method tried was using a Multi-layered Perceptron (MLP). While MLPs are not efficient or designed for image processing we wanted to have another method to compare to. It extracts features from images by using multiple layers of convolution to extract features and scale each pixel to include nearby features. 
 
 \begin{lstlisting}[language=Python]
 # CNN feature extractor
@@ -331,7 +331,7 @@ self.cnn = nn.Sequential(
     nn.ReLU(),
     nn.MaxPool2d(2))
 \end{lstlisting}
-The model then feeds each pixel and related features into two fully connected layers, and returns the estimated depth. 
+The model then feeds each pixel and related features into a fully connced hidden layer, and uses that to calculate the estimated depth. 
 
 \begin{lstlisting}[language=Python]
 #MLP per-pixel
