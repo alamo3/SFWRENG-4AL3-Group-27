@@ -315,9 +315,9 @@ not significantly improve the pretrained model's ability to distinguish features
 critical to depth. If this was the case, the weights of the layers extracted
 from the ResNet-50 model should yield a lower error which they do not
 . 
-\subsection{Multi-layered Perceptron}
+\subsection{Multi-layered Perceptron Hybrid}
 
-Another method tried was using a Multi-layered Perceptron (MLP). While MLPs are not efficient or designed for image processing we wanted to have another method to compare to. It extracts features from images by using multiple layers of convolution to extract features and scale each pixel to include nearby features. 
+Another method tried was using a Multi-layered Perceptron (MLP). MLPs are not efficient or designed for image processing as that utilize many fully connected layers. As we still wanted to have another method to compare to, we decided to implement the MLP after extracting features from images. We did this by using multiple layers of convolution to extract features and scale each pixel to include nearby features, giving each pixel 128 features to train the MLP on.
 
 \begin{lstlisting}[language=Python]
 # CNN feature extractor
@@ -597,7 +597,7 @@ The results are very similar to just using the ResNet34 backbone. Perhaps since
 it was trained on a much larger dataset compared to the ResNet34 model, it has a
 lower accuracy, since it is unable to accurately fit and learn all the
 datapoints. 
-\subsection*{MLP Evaluation}
+\subsection*{MLP Hybrid Evaluation}
 As MLPs are inefficient on images we wanted to first gauge the effectiveness by training the dataset on the same 1000 images as the Initial Implementation. The results are the results of training the MLP model for 8 epochs. The model was stopped at 8 due to poor training time and the performance metrics not improving. The performance was also lacking even though it is comparable to the previous ResNet implementations. 
 
 
