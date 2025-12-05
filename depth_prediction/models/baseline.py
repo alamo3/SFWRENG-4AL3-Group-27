@@ -9,6 +9,7 @@ class RandomClassifierBaseline(nn.Module):
         
         batch_size = x.shape[0]
         # torch.rand returns values from a uniform distribution [0, 1)
-        return torch.rand(batch_size, 1, 96, 320, device=x.device)
+        return torch.rand(batch_size, 1, 96, 320, device=x.device) 
+    
     
     

@@ -1,6 +1,7 @@
 import torch
 from torch.utils.data import DataLoader, random_split
 from models.baseline import RandomClassifierBaseline
+from models.zero_model import ZeroBaseline
 from data.kitti_selection import KITTIDepthSelectionDataset
 from tqdm import tqdm
 import os
@@ -85,7 +86,7 @@ def run():
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     dataset = KITTIDepthSelectionDataset("KITTI/selection")
-    train_size = int(0.9 * len(dataset))
+    train_size = 0
     val_size = len(dataset) - train_size
     _, val_ds = random_split(dataset, [train_size, val_size])
 
