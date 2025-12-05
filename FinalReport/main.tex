@@ -602,6 +602,47 @@ This result is technically "better" than the ground truth. This could lead to
 unforeseen penalization of the model by the loss function. This may be avoided in
 the future by using better datasets. 
 
+\subsection*{Baseline Evaluation}
+The evaluation of the linearly random baseline, which has been described above.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Metric} & \textbf{Value} \\
+\hline
+Validation Loss (SiLog) & 1.3207 \\
+Rel Sq & 8.4483 \\
+Abs Rel & 0.6587 \\
+iRMSE & 1.9262 \\
+\hline
+
+\end{tabular}
+\caption{Linear Random Baseline Evaluation Metrics }
+\label{tab:metrics}
+\end{table}
+
+The evaluation of the zero baseline which always returns zero depth.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Metric} & \textbf{Value} \\
+\hline
+Validation Loss (SiLog) & 0.3345 \\
+Rel Sq & 4.4797 \\
+Abs Rel & 0.4094 \\
+iRMSE & 0.0432 \\
+\hline
+
+\end{tabular}
+\caption{Zero Baseline Evaluation Metrics }
+\label{tab:metrics}
+\end{table}
+
+The results of the baseline show that our initial attempts, while better than a random depth map are not good models as they are comparable to the zero baseline. However, the vision transformer model is not only better than our initial attempts it is also much better than out baselines, meaning that the model is properly evaluating depth as compared to the previous models. 
+
 \section{Progress} \label{sec:progress}
 
 For the final implementation, we stayed on track with what we had planned in the
