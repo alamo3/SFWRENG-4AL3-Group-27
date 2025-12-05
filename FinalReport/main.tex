@@ -242,7 +242,7 @@ architectures, these extracted features are passed to a decoder network. No
 other pre-processing or feature engineering is applied to the input datsaset.
 
 The exact implementation of these architectures will be detailed in the
-\href{sec:implementation}{ implementation } section.
+\href{sec:implementation}{ implementation} section.
 
 
 \section{Implementation} \label{sec:implementation}
@@ -313,7 +313,36 @@ results from using either of these backbones and the decoder architecture
 described are very similar. This suggests that the jump from 34 to 50 layers did
 not significantly improve the pretrained model's ability to distinguish features
 critical to depth. If this was the case, the weights of the layers extracted
-from the ResNet-50 model should yield a lower error which they do not. 
+from the ResNet-50 model should yield a lower error which they do not
+. 
+\subsection{Multi-layered Perceptron}
+
+Another method tried was using a Multi-layered Perceptron (MLP). While MLPs are not vary efficient or designed for image processing we wanted to have another method to compare to. It extracts features from images by using multiple layers of convolution to extract features and scale each pixel to include nearby features. 
+
+\begin{lstlisting}[language=Python]
+# CNN feature extractor
+self.cnn = nn.Sequential(
+    nn.Conv2d(3, 32, 3, padding=1),  # input RGB
+    nn.ReLU(),
+    nn.Conv2d(32, 64, 3, padding=1),
+    nn.ReLU(),
+    #nn.MaxPool2d(2),  # downsample
+    nn.Conv2d(64, 128, 3, padding=1),
+    nn.ReLU(),
+    nn.MaxPool2d(2))
+\end{lstlisting}
+The model then feeds each pixel and related features into two fully connected layers, and returns the estimated depth. 
+
+\begin{lstlisting}[language=Python]
+#MLP per-pixel
+self.mlp = nn.Sequential(
+    nn.Linear(128, 64),
+    nn.ReLU(),
+    nn.Linear(64, 1)  # depth output)
+\end{lstlisting}
+
+
+
 
 \subsection{Vision Transformer Depth Net}
 
@@ -568,6 +597,28 @@ The results are very similar to just using the ResNet34 backbone. Perhaps since
 it was trained on a much larger dataset compared to the ResNet34 model, it has a
 lower accuracy, since it is unable to accurately fit and learn all the
 datapoints. 
+\subsection*{MLP Evaluation}
+As MLPs are inefficient on images we wanted to first gauge the effectiveness by training the dataset on the same 1000 images as the Initial Implementation. The results are the results of training the MLP model for 8 epochs. The model was stopped at 8 due to poor training time and the performance metrics not improving. The performance was also lacking even though it is comparable to the previous ResNet implementations. 
+
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Metric} & \textbf{Value} \\
+\hline
+Validation Loss (SiLog) & 0.2551 \\
+Training Loss (SiLog) & 0.5040 \\
+Rel Sq & 3.8085 \\
+Abs Rel & 0.3608 \\
+iRMSE & 0.0397 \\
+\hline
+
+\end{tabular}
+\caption{MLP Model Evaluation Metrics on Validation Set after 8 Epochs}
+\label{tab:metrics}
+\end{table}
+
 
 \subsection*{Vision Transformer Implementation Evaluation}
 
@@ -647,7 +698,7 @@ iRMSE & 0.0432 \\
 \label{tab:metrics}
 \end{table}
 
-The results of the baseline show that our initial attempts, while better than a random depth map are not good models as they are comparable to the zero baseline. However, the vision transformer model is not only better than our initial attempts it is also much better than the baselines, meaning that the model is properly evaluating depth as compared to the previous models. 
+The results of the baseline show that our initial ResNet attempts, while better than a random depth map are not good models as they are comparable to the zero baseline. However, the vision transformer model is not only better than our initial attempts it is also much better than the baselines, meaning that the model is properly evaluating depth as compared to the previous models. 
 
 Comparing our values to the benchmarks on the KITTI website gives us similar results as our benchmarks. Our initial models were bad and had a SILog of almost 2x the worst model published on the website. However, the vision transformer model did much better with a SiLog of 0.0033815 or 0.33815 as would be displayed on the website.
 
